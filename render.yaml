@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: death-note-server
+    env: node
+    region: singapore # Optional, close to Japan
+    buildCommand: npm install && npm run build --workspace=server
+    startCommand: npm start --workspace=server
+    envVars:
+      - key: CLIENT_URL
+        sync: false # User needs to input this in Render Dashboard
+      - key: PORT
+        value: 10000
+    plan: free

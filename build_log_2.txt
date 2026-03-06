@@ -1,0 +1,1 @@
+client/src/components/game/CutscenePlayer.tsx(11,12): error TS6133: 'isPlaying' is declared but its value is never read.
