@@ -3,7 +3,7 @@ services:
     name: death-note-server
     env: node
     region: singapore # Optional, close to Japan
-    buildCommand: npm install && npm run build --workspace=server
+    buildCommand: npm install
     startCommand: npm start --workspace=server
     envVars:
       - key: CLIENT_URL
