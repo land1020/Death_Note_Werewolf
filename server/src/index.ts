@@ -10,13 +10,25 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 
+const allowedOrigins = [
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+];
+
 const io = new Server(httpServer, {
     cors: {
-        origin: [
-            process.env.CLIENT_URL || 'http://localhost:5173',
-            'http://localhost:5174',
-            'http://localhost:5175'
-        ],
+        origin: (origin, callback) => {
+            // Allow requests with no origin (mobile apps, curl, etc.)
+            if (!origin) return callback(null, true);
+            // Allow exact matches from allowedOrigins
+            if (allowedOrigins.includes(origin)) return callback(null, true);
+            // Allow all Vercel preview/branch deployments
+            if (origin.endsWith('.vercel.app')) return callback(null, true);
+            console.log(`🚫 CORS blocked origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        },
         methods: ['GET', 'POST'],
     },
 });
