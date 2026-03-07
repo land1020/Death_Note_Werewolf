@@ -269,6 +269,10 @@ class SocketClient {
     // Room actions
     createRoom(playerName: string, maxPlayers: number, useMello: boolean, isDebug: boolean = false): void {
         if (!this.socket) return;
+        if (!this.socket.connected) {
+            store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
+            return;
+        }
         localStorage.setItem('dn_playerName', playerName);
         store.dispatch(setLoading(true));
         store.dispatch(clearError());
@@ -297,6 +301,10 @@ class SocketClient {
 
     joinRoom(roomCode: string, playerName: string): void {
         if (!this.socket) return;
+        if (!this.socket.connected) {
+            store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
+            return;
+        }
         localStorage.setItem('dn_playerName', playerName);
         store.dispatch(setLoading(true));
         store.dispatch(clearError());
