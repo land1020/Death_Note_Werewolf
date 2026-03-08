@@ -223,7 +223,7 @@ export default function LobbyPage() {
                             </button>
                         </div>
 
-                        {/* Debug Mode: Add NPC & Spectator Toggle */}
+                        {/* Room Controls: Add NPC & Spectator Toggle */}
                         {isHost && (
                             <div className="grid grid-cols-2 gap-3">
                                 <button
