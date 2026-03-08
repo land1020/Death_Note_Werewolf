@@ -236,8 +236,8 @@ function advanceTurn(io: TypedServer, game: GameState, roomCode: string) {
 
             io.to(roomCode).emit('game:phaseChanged', { phase: game.phase });
 
-            // Debug Mode: ボットの裁き応答を自動トリガー
-            if (game.isDebug) {
+            // NPCがいる場合、ボットの裁き応答を自動トリガー
+            if (game.players.some(p => p.id.startsWith('npc-'))) {
                 BotLogic.handleBotJudgmentAction(io, game, roomCode);
             }
 
@@ -271,11 +271,11 @@ function advanceTurn(io: TypedServer, game: GameState, roomCode: string) {
     // 全プレイヤーにゲーム状態を送信
     broadcastGameState(io, game, roomCode);
 
-    // Debug Mode: If next player is Bot (no socket), trigger bot logic
+    // If next player is Bot (no socket), trigger bot logic
     const nextPlayer = alivePlayers[nextIndex];
     const nextSocketId = [...playerSockets.entries()].find(([_, pid]) => pid === nextPlayer.id)?.[0];
 
-    if (!nextSocketId && game.isDebug && nextPlayer.id.startsWith('npc-')) {
+    if (!nextSocketId && nextPlayer.id.startsWith('npc-')) {
         // Trigger bot turn (async, runs in background)
         BotLogic.executeBotTurn(io, game, roomCode, nextPlayer.id, advanceTurn, broadcastGameState);
     }
@@ -430,14 +430,22 @@ export function setupSocketHandlers(io: TypedServer) {
 
         // ==================== Room Events ====================
 
-        socket.on('room:create', (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig; roleConfig?: RoleConfig }) => {
+        socket.on('room:create', (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig; roleConfig?: RoleConfig; roomCode?: string }) => {
             const { playerName, maxPlayers, useMello, isDebug, deckConfig, roleConfig } = data;
 
             // Generate unique room code
             let roomCode: string;
-            do {
-                roomCode = generateRoomCode();
-            } while (rooms.has(roomCode));
+            if (data.roomCode) {
+                if (rooms.has(data.roomCode)) {
+                    socket.emit('room:error', { message: '指定された部屋番号はすでに存在します。「部屋情報をリセット」を試してください。' });
+                    return;
+                }
+                roomCode = data.roomCode;
+            } else {
+                do {
+                    roomCode = generateRoomCode();
+                } while (rooms.has(roomCode));
+            }
 
             const playerId = generateId();
 
@@ -486,6 +494,26 @@ export function setupSocketHandlers(io: TypedServer) {
             }
         });
 
+        socket.on('room:reset', (data: { roomCode: string }) => {
+            if (rooms.has(data.roomCode)) {
+                // 部屋に関係する人たちを追い出す (Disconnect them or just emit kicked? Just clean up data is fine, client handles recreate)
+                const roomToReset = rooms.get(data.roomCode);
+                if (roomToReset) {
+                    for (const p of roomToReset.players) {
+                        for (const [sid, pid] of playerSockets.entries()) {
+                            if (pid === p.id) {
+                                io.to(sid).emit('room:kicked');
+                                playerSockets.delete(sid);
+                            }
+                        }
+                    }
+                }
+                rooms.delete(data.roomCode);
+                games.delete(data.roomCode);
+                console.log(`🧹 Room ${data.roomCode} was manually reset`);
+            }
+        });
+
         socket.on('room:addNpc', () => {
             const playerId = playerSockets.get(socket.id);
             if (!playerId) return;
@@ -503,7 +531,6 @@ export function setupSocketHandlers(io: TypedServer) {
             }
 
             if (!targetRoom || !roomCode) return;
-            if (!targetRoom.isDebug) return; // Only in debug mode
             if (targetRoom.hostId !== playerId) return; // Only host
             if (targetRoom.players.length >= targetRoom.maxPlayers) return;
 
@@ -1400,8 +1427,8 @@ export function setupSocketHandlers(io: TypedServer) {
                         }, 15000);
                     }
 
-                    // Debug Mode: ボットの投票/取調応答を自動トリガー
-                    if (game.isDebug) {
+                    // NPCがいる場合、ボットの投票/取調応答を自動トリガー
+                    if (game.players.some(p => p.id.startsWith('npc-'))) {
                         if (game.pendingAction.type === 'VOTE') {
                             BotLogic.handleBotVoteResponse(io, game, roomCode, broadcastGameState, advanceTurn);
                         } else if (game.pendingAction.type === 'INTERROGATION') {
@@ -2127,7 +2154,7 @@ function continueAfterJudgmentCutscene(
             // 次のターンのプレイヤーがボットなら行動を開始
             const nextPlayer = game.players.find(p => p.id === game.currentPlayerId);
             const nextSocketId = nextPlayer ? [...playerSockets.entries()].find(([_, pid]) => pid === nextPlayer.id)?.[0] : null;
-            if (nextPlayer && !nextSocketId && game.isDebug && nextPlayer.id.startsWith('npc-')) {
+            if (nextPlayer && !nextSocketId && nextPlayer.id.startsWith('npc-')) {
                 import('../game/botLogic.js').then(({ BotLogic }) => {
                     BotLogic.executeBotTurn(io, game, roomCode, nextPlayer.id, advanceTurn, broadcastGameState);
                 });

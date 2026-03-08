@@ -267,7 +267,7 @@ class SocketClient {
     // ==================== Emit Methods ====================
 
     // Room actions
-    createRoom(playerName: string, maxPlayers: number, useMello: boolean, isDebug: boolean = false): void {
+    createRoom(playerName: string, maxPlayers: number, useMello: boolean, isDebug: boolean = false, roomCode?: string): void {
         if (!this.socket) return;
         if (!this.socket.connected) {
             store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
@@ -276,7 +276,16 @@ class SocketClient {
         localStorage.setItem('dn_playerName', playerName);
         store.dispatch(setLoading(true));
         store.dispatch(clearError());
-        this.socket.emit('room:create', { playerName, maxPlayers, useMello, isDebug });
+        this.socket.emit('room:create', { playerName, maxPlayers, useMello, isDebug, roomCode });
+    }
+
+    resetRoom(roomCode: string): void {
+        if (!this.socket) return;
+        if (!this.socket.connected) {
+            store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
+            return;
+        }
+        this.socket.emit('room:reset', { roomCode });
     }
 
     toggleSpectator(isSpectator: boolean): void {

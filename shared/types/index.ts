@@ -298,7 +298,8 @@ export interface RootState {
  */
 export interface ClientToServerEvents {
     // ロビー
-    'room:create': (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig }) => void;
+    'room:create': (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig; roomCode?: string }) => void;
+    'room:reset': (data: { roomCode: string }) => void;
     'room:addNpc': () => void; // Debug only
     'debug:getLogs': () => void;
     'room:join': (data: { playerName: string; roomCode: string }) => void;
@@ -529,7 +530,8 @@ export interface VoteResult {
 // Socketイベントの追加
 export interface ClientToServerEvents {
     // ... (existing events)
-    'room:create': (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig }) => void;
+    'room:create': (data: { playerName: string; maxPlayers: number; useMello: boolean; isDebug?: boolean; deckConfig?: DeckConfig; roomCode?: string }) => void;
+    'room:reset': (data: { roomCode: string }) => void;
     'room:addNpc': () => void; // Debug only
     'debug:getLogs': () => void;
     'room:join': (data: { playerName: string; roomCode: string }) => void;

@@ -13,6 +13,7 @@ interface CreateRoomModalProps {
 export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
     const navigate = useNavigate();
     const [playerName, setPlayerName] = useState('');
+    const [customRoomCode, setCustomRoomCode] = useState('');
     const [isDebug, setIsDebug] = useState(false);
     const [validationError, setValidationError] = useState('');
 
@@ -43,8 +44,30 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
 
     const handleCreate = () => {
         if (!validateName(playerName)) return;
+
+        let finalRoomCode: string | undefined = undefined;
+        if (customRoomCode.trim() !== '') {
+            if (!/^[0-9]{4}$/.test(customRoomCode.trim())) {
+                setValidationError('部屋番号は4桁の数字で入力してください');
+                return;
+            }
+            finalRoomCode = customRoomCode.trim();
+        }
+
         // 最大人数を8に固定し、メロ使用はデフォルトfalse（後でロビーで調整可能へ）
-        socketClient.createRoom(playerName.trim(), 8, false, isDebug);
+        socketClient.createRoom(playerName.trim(), 8, false, isDebug, finalRoomCode);
+    };
+
+    const handleResetRoom = () => {
+        if (!/^[0-9]{4}$/.test(customRoomCode.trim())) {
+            setValidationError('リセットする部屋番号を4桁の数字で入力してください');
+            return;
+        }
+        socketClient.resetRoom(customRoomCode.trim());
+        setValidationError('部屋情報をリセットしました。');
+
+        // Clear message after 3 seconds
+        setTimeout(() => setValidationError(''), 3000);
     };
 
     const handleBackdropClick = (e: React.MouseEvent) => {
@@ -83,6 +106,33 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
                         className="input-field w-full"
                         disabled={isLoading}
                     />
+                </div>
+
+                {/* Custom Room Code */}
+                <div className="mb-4">
+                    <label className="block text-dn-text-secondary text-sm mb-2">
+                        部屋番号 (任意)
+                    </label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={customRoomCode}
+                            onChange={(e) => setCustomRoomCode(e.target.value)}
+                            placeholder="例: 1234 (空欄で自動生成)"
+                            maxLength={4}
+                            className="input-field flex-1"
+                            disabled={isLoading}
+                        />
+                        <button
+                            onClick={handleResetRoom}
+                            className="bg-red-500/20 hover:bg-red-500/40 text-red-500 border border-red-500/50 rounded-lg px-4 text-sm whitespace-nowrap transition-colors"
+                            disabled={isLoading}
+                            title="入力した部屋番号の情報をリセットします"
+                        >
+                            部屋情報をリセット
+                        </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">4桁の数字を指定できます。同じ番号で遊び直す場合はリセットを押してください。</p>
                 </div>
 
                 {/* Debug Mode Option */}
