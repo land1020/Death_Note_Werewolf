@@ -148,18 +148,35 @@ function createPersonalizedState(gameState: GameState, playerId: string): GameSt
             // 自分自身、またはデバッグモードでのホスト向けのNPC情報である場合は全公開する
             const isNpcDebug = (gameState as any).isDebug && player.id.startsWith('npc-') && myPlayer?.isHost;
             const isSpectatingOrDead = myPlayer?.isSpectator || myPlayer?.isAlive === false;
+            const isGameEnd = gameState.phase === GamePhase.GAME_END;
 
-            if (player.id === playerId || isNpcDebug || isSpectatingOrDead) {
-                // 自分自身の情報、または観戦者/死亡者の場合は他人の情報もそのまま返す
+            if (player.id === playerId || isNpcDebug || isSpectatingOrDead || isGameEnd) {
+                // 自分自身の情報、または観戦者/死亡者/ゲーム終了時の場合は他人の情報もそのまま返す
                 return player;
+            }
+
+            // Misa during Judgment phase can see Kira and Death Note
+            let revealedRole = null;
+            let revealedTeam = null;
+            let revealedHand = player.hand.map(() => createHiddenCard());
+
+            if (gameState.phase === GamePhase.JUDGMENT && myRole === Role.MISA) {
+                if (player.role === Role.KIRA) {
+                    revealedRole = player.role;
+                    revealedTeam = player.team;
+                }
+                const deathNoteCard = player.hand.find(c => c.id === 0);
+                if (deathNoteCard) {
+                    revealedHand = player.hand.map(c => c.id === 0 ? deathNoteCard : createHiddenCard());
+                }
             }
 
             // その他のプレイヤーは役職と手札を隠す
             return {
                 ...player,
-                role: null,
-                team: null,
-                hand: player.hand.map(() => createHiddenCard()),
+                role: revealedRole,
+                team: revealedTeam,
+                hand: revealedHand,
             };
         }),
         kiraMisaChat: (myPlayer?.role === Role.KIRA || myPlayer?.role === Role.MISA || myPlayer?.isSpectator || myPlayer?.isAlive === false)
@@ -588,9 +605,30 @@ export function setupSocketHandlers(io: TypedServer) {
             }
 
             // Check for duplicate names
-            if (room.players.some((p: Player) => p.name === playerName)) {
-                socket.emit('room:error', { message: 'その名前は既に使用されています' });
-                return;
+            const existingPlayer = room.players.find((p: Player) => p.name === playerName);
+            if (existingPlayer) {
+                if (existingPlayer.isConnected) {
+                    socket.emit('room:error', { message: 'その名前は既に使用されています' });
+                    return;
+                } else {
+                    // Auto-rejoin if the player disconnected
+                    playerSockets.set(socket.id, existingPlayer.id);
+                    socket.join(roomCode);
+
+                    existingPlayer.isConnected = true;
+
+                    // Emit events to sync state
+                    socket.emit('room:joined', { playerId: existingPlayer.id });
+                    io.to(roomCode).emit('room:updated', { room });
+                    console.log(`♻️ Player ${playerName} auto-rejoined room ${roomCode} from join screen`);
+
+                    // Send active game state if running
+                    const game = games.get(roomCode);
+                    if (game && game.phase !== GamePhase.GAME_END && game.phase !== GamePhase.LOBBY) {
+                        socket.emit('game:state', { gameState: createPersonalizedState(game, existingPlayer.id) });
+                    }
+                    return;
+                }
             }
 
             const playerId = generateId();

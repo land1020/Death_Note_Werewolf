@@ -75,6 +75,19 @@ export function processDeath(
     victim.isAlive = false;
     console.log(`💀 Player ${victim.name} (${victim.role}) died.`);
 
+    // 手札をすべて捨て札プールに移動
+    if (victim.hand && victim.hand.length > 0) {
+        for (const card of victim.hand) {
+            card.isUsed = true;
+            card.usedByName = victim.name;
+            card.usedByColor = victim.color;
+            if (!card.history) card.history = [];
+            card.history.push(`${victim.name}が死亡して捨てられた`);
+            addToDiscardPile(game, card);
+        }
+        victim.hand = [];
+    }
+
     // Notify
     io.to(roomCode).emit('game:playerDied', {
         playerId: victimId,
