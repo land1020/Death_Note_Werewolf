@@ -276,24 +276,28 @@ export default function GamePage() {
             {/* Cutscene Overlay */}
             {cutscenePlaying && cutsceneType === 'SHINIGAMI' && (
                 <CutscenePlayer
+                    type="SHINIGAMI"
                     videoSrc="/assets/videos/shinigami.mp4"
                     onComplete={handleCutsceneComplete}
                 />
             )}
             {cutscenePlaying && cutsceneType === 'GUN' && (
                 <CutscenePlayer
+                    type="GUN"
                     videoSrc="/assets/videos/Death Note gun scene.mp4"
                     onComplete={handleCutsceneComplete}
                 />
             )}
             {cutscenePlaying && cutsceneType === 'ARREST' && (
                 <CutscenePlayer
+                    type="ARREST"
                     videoSrc="/assets/videos/Death Note arrest scene.mp4"
                     onComplete={handleCutsceneComplete}
                 />
             )}
             {cutscenePlaying && cutsceneType === 'JUDGMENT' && (
                 <CutscenePlayer
+                    type="JUDGMENT"
                     videoSrc="/assets/videos/Death Note Death Scene.mp4"
                     onComplete={handleCutsceneComplete}
                 />

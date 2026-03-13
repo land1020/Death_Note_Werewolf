@@ -2,13 +2,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CutscenePlayerProps {
+    type?: 'SHINIGAMI' | 'GUN' | 'ARREST' | 'JUDGMENT' | null;
     videoSrc: string;
     onComplete: () => void;
 }
 
-export const CutscenePlayer: React.FC<CutscenePlayerProps> = ({ videoSrc, onComplete }) => {
+export const CutscenePlayer: React.FC<CutscenePlayerProps> = ({ type, videoSrc, onComplete }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [error, setError] = useState(false);
+
+    const getFallbackText = () => {
+        switch (type) {
+            case 'SHINIGAMI': return '💀 死神の目が発動した... 💀';
+            case 'GUN': return '🔫 銃声が響き渡った... 💥';
+            case 'ARREST': return '🚔 キラを逮捕した！ 🚨';
+            case 'JUDGMENT': return '📓 裁きが下された... 💀';
+            default: return '演出処理中...';
+        }
+    };
 
     useEffect(() => {
         if (videoRef.current) {
@@ -45,7 +56,7 @@ export const CutscenePlayer: React.FC<CutscenePlayerProps> = ({ videoSrc, onComp
                     />
                 ) : (
                     <div className="text-white text-2xl font-bold animate-pulse">
-                        💀 死神の目が発動した... 💀
+                        {getFallbackText()}
                     </div>
                 )}
 
