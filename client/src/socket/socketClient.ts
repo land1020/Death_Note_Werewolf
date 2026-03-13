@@ -70,9 +70,9 @@ class SocketClient {
                 store.dispatch(clearError());
 
                 // セッション永続化: 以前の接続情報があれば再接続を試みる
-                const savedPlayerId = localStorage.getItem('dn_playerId');
-                const savedRoomCode = localStorage.getItem('dn_roomCode');
-                const savedPlayerName = localStorage.getItem('dn_playerName');
+                const savedPlayerId = sessionStorage.getItem('dn_playerId');
+                const savedRoomCode = sessionStorage.getItem('dn_roomCode');
+                const savedPlayerName = sessionStorage.getItem('dn_playerName');
                 if (savedPlayerId && savedRoomCode && savedPlayerName) {
                     store.dispatch(setLoading(true));
                     console.log(`♻️ Attempting to rejoin room ${savedRoomCode} as ${savedPlayerName}...`);
@@ -118,17 +118,17 @@ class SocketClient {
 
         // Room events
         this.socket.on('room:created', (data) => {
-            localStorage.setItem('dn_playerId', data.playerId);
-            localStorage.setItem('dn_roomCode', data.roomCode);
+            sessionStorage.setItem('dn_playerId', data.playerId);
+            sessionStorage.setItem('dn_roomCode', data.roomCode);
             store.dispatch(setRoom({ code: data.roomCode, playerId: data.playerId }));
             store.dispatch(setLoading(false));
         });
 
         this.socket.on('room:joined', (data) => {
-            const roomCode = data.roomCode || this.pendingRoomCode || store.getState().room.code || localStorage.getItem('dn_roomCode');
+            const roomCode = data.roomCode || this.pendingRoomCode || store.getState().room.code || sessionStorage.getItem('dn_roomCode');
             if (roomCode) {
-                localStorage.setItem('dn_playerId', data.playerId);
-                localStorage.setItem('dn_roomCode', roomCode);
+                sessionStorage.setItem('dn_playerId', data.playerId);
+                sessionStorage.setItem('dn_roomCode', roomCode);
                 store.dispatch(joinedRoom({ code: roomCode, playerId: data.playerId }));
             }
             this.pendingRoomCode = null;
@@ -145,9 +145,9 @@ class SocketClient {
 
             // 参加失敗や無効な部屋だった場合はローカルストレージをクリアする
             if (data.message.includes('見つかりません') || data.message.includes('満員') || data.message.includes('進行中')) {
-                localStorage.removeItem('dn_playerId');
-                localStorage.removeItem('dn_roomCode');
-                localStorage.removeItem('dn_playerName');
+                sessionStorage.removeItem('dn_playerId');
+                sessionStorage.removeItem('dn_roomCode');
+                sessionStorage.removeItem('dn_playerName');
                 store.dispatch(resetRoom());
                 store.dispatch(resetGame());
             }
@@ -156,9 +156,9 @@ class SocketClient {
         // 退出させられた場合
         this.socket.on('room:kicked' as any, () => {
             console.log('🚪 You have been kicked from the room.');
-            localStorage.removeItem('dn_playerId');
-            localStorage.removeItem('dn_roomCode');
-            localStorage.removeItem('dn_playerName');
+            sessionStorage.removeItem('dn_playerId');
+            sessionStorage.removeItem('dn_roomCode');
+            sessionStorage.removeItem('dn_playerName');
             store.dispatch(setError('ホストによって部屋から退出させられました'));
             store.dispatch(resetRoom());
             store.dispatch(resetGame());
@@ -274,7 +274,7 @@ class SocketClient {
             store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
             return;
         }
-        localStorage.setItem('dn_playerName', playerName);
+        sessionStorage.setItem('dn_playerName', playerName);
         store.dispatch(setLoading(true));
         store.dispatch(clearError());
         this.socket.emit('room:create', { playerName, maxPlayers, useMello, isDebug, roomCode });
@@ -315,7 +315,7 @@ class SocketClient {
             store.dispatch(setError('サーバーと通信できません。サーバーが起動しているか確認してください。'));
             return;
         }
-        localStorage.setItem('dn_playerName', playerName);
+        sessionStorage.setItem('dn_playerName', playerName);
         store.dispatch(setLoading(true));
         store.dispatch(clearError());
         // Store room code temporarily - isHost will be set by room:joined event
@@ -325,9 +325,9 @@ class SocketClient {
 
     leaveRoom(): void {
         if (!this.socket) return;
-        localStorage.removeItem('dn_playerId');
-        localStorage.removeItem('dn_roomCode');
-        localStorage.removeItem('dn_playerName');
+        sessionStorage.removeItem('dn_playerId');
+        sessionStorage.removeItem('dn_roomCode');
+        sessionStorage.removeItem('dn_playerName');
         this.socket.emit('room:leave');
         store.dispatch(resetRoom());
         store.dispatch(resetGame());
