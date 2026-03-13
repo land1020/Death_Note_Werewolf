@@ -352,7 +352,7 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
     // ロビー
     'room:created': (data: { roomCode: string; playerId: string }) => void;
-    'room:joined': (data: { playerId: string }) => void;
+    'room:joined': (data: { playerId: string; roomCode?: string }) => void;
     'room:updated': (data: { room: Room }) => void;
     'room:error': (data: { message: string }) => void;
 
@@ -574,7 +574,7 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
     // ... (existing events)
     'room:created': (data: { roomCode: string; playerId: string }) => void;
-    'room:joined': (data: { playerId: string }) => void;
+    'room:joined': (data: { playerId: string; roomCode?: string }) => void;
     'room:updated': (data: { room: Room }) => void;
     'room:error': (data: { message: string }) => void;
     'room:kicked': () => void; // キックされた際の通知

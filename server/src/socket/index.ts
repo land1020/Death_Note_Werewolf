@@ -618,7 +618,7 @@ export function setupSocketHandlers(io: TypedServer) {
                     existingPlayer.isConnected = true;
 
                     // Emit events to sync state
-                    socket.emit('room:joined', { playerId: existingPlayer.id });
+                    socket.emit('room:joined', { playerId: existingPlayer.id, roomCode });
                     io.to(roomCode).emit('room:updated', { room });
                     console.log(`♻️ Player ${playerName} auto-rejoined room ${roomCode} from join screen`);
 
@@ -658,7 +658,7 @@ export function setupSocketHandlers(io: TypedServer) {
 
             socket.join(roomCode);
 
-            socket.emit('room:joined', { playerId });
+            socket.emit('room:joined', { playerId, roomCode });
             io.to(roomCode).emit('room:updated', { room });
 
             console.log(`👤 ${playerName} joined room ${roomCode} `);
@@ -688,7 +688,7 @@ export function setupSocketHandlers(io: TypedServer) {
                 player.name = playerName;
             }
 
-            socket.emit('room:joined', { playerId });
+            socket.emit('room:joined', { playerId, roomCode });
             io.to(roomCode).emit('room:updated', { room });
             console.log(`♻️ Player ${playerName} rejoined room ${roomCode}`);
 

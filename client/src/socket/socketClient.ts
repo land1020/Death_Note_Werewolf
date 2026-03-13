@@ -124,7 +124,7 @@ class SocketClient {
         });
 
         this.socket.on('room:joined', (data) => {
-            const roomCode = this.pendingRoomCode || store.getState().room.code;
+            const roomCode = data.roomCode || this.pendingRoomCode || store.getState().room.code || localStorage.getItem('dn_roomCode');
             if (roomCode) {
                 localStorage.setItem('dn_playerId', data.playerId);
                 localStorage.setItem('dn_roomCode', roomCode);
