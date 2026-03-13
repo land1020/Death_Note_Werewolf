@@ -50,30 +50,30 @@ export const MisaJudgmentView: React.FC = () => {
                 {/* Left: Info Panel */}
                 <div className="bg-gray-900/80 rounded-xl p-6 border border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.2)]">
                     <h2 className="text-3xl font-bold text-purple-400 mb-6 font-serif">
-                        You are MISA
+                        あなたはミサです
                     </h2>
 
                     <div className="space-y-6">
                         {/* Kira Info */}
                         <div className="p-6 rounded-lg bg-red-900/20 border border-red-500/30">
-                            <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">Kira's Identity</p>
+                            <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">キラプレイヤー</p>
                             <p className="text-3xl font-bold text-red-500">
-                                {kira ? kira.name : 'Unknown / Dead'}
+                                {kira ? kira.name : '不明 / 死亡'}
                             </p>
                         </div>
 
                         {/* Death Note Holder Info - Note: This requires server support to be accurate for others */}
                         <div className="p-6 rounded-lg bg-yellow-900/20 border border-yellow-500/30">
-                            <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">Death Note Holder</p>
+                            <p className="text-gray-400 text-sm mb-1 uppercase tracking-wider">デスノート所持者</p>
                             <p className="text-3xl font-bold text-yellow-500">
-                                {deathNoteHolder ? deathNoteHolder.name : 'Unknown (Hidden)'}
+                                {deathNoteHolder ? deathNoteHolder.name : '不明（隠匿）'}
                             </p>
                         </div>
                     </div>
 
                     <div className="mt-8 text-center bg-black/40 p-4 rounded-lg">
                         <p className="text-gray-400 animate-pulse mb-4">
-                            Waiting for Kira's judgment...
+                            キラの裁きを待っています...
                         </p>
 
                         {!isConfirmed ? (
@@ -94,7 +94,7 @@ export const MisaJudgmentView: React.FC = () => {
                 {/* Right: Chat Panel */}
                 <div className="bg-gray-900/80 rounded-xl p-6 border border-purple-500/30 h-full min-h-[500px] flex flex-col">
                     <h3 className="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
-                        <span>🔒</span> Secret Chat with Kira
+                        <span>🔒</span> キラへの密談
                     </h3>
                     <div className="flex-1 bg-black/30 rounded-lg p-2 overflow-hidden relative">
                         <div className="absolute inset-0">

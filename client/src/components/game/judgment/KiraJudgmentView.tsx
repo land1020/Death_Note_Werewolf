@@ -58,7 +58,7 @@ export const KiraJudgmentView: React.FC = () => {
                 <div className="bg-gray-900/80 rounded-xl p-6 border border-red-500/30 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
                     <div className="mb-6 border-b border-red-500/30 pb-4">
                         <h2 className="text-3xl font-bold text-red-500 mb-2 font-serif">
-                            You are KIRA
+                            あなたはキラです
                         </h2>
                         {misa && (
                             <p className="text-gray-400">

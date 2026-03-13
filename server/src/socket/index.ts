@@ -148,7 +148,7 @@ function createPersonalizedState(gameState: GameState, playerId: string): GameSt
             // 自分自身、またはデバッグモードでのホスト向けのNPC情報である場合は全公開する
             const isNpcDebug = (gameState as any).isDebug && player.id.startsWith('npc-') && myPlayer?.isHost;
             const isSpectatingOrDead = myPlayer?.isSpectator || myPlayer?.isAlive === false;
-            const isGameEnd = gameState.phase === GamePhase.GAME_END;
+            const isGameEnd = gameState.phase === GamePhase.GAME_END || gameState.phase === GamePhase.JUDGMENT_RESULT;
 
             if (player.id === playerId || isNpcDebug || isSpectatingOrDead || isGameEnd) {
                 // 自分自身の情報、または観戦者/死亡者/ゲーム終了時の場合は他人の情報もそのまま返す
@@ -252,6 +252,7 @@ function advanceTurn(io: TypedServer, game: GameState, roomCode: string) {
             };
 
             io.to(roomCode).emit('game:phaseChanged', { phase: game.phase });
+            broadcastGameState(io, game, roomCode);
 
             // NPCがいる場合、ボットの裁き応答を自動トリガー
             if (game.players.some(p => p.id.startsWith('npc-'))) {
