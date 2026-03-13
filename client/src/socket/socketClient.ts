@@ -74,6 +74,7 @@ class SocketClient {
                 const savedRoomCode = localStorage.getItem('dn_roomCode');
                 const savedPlayerName = localStorage.getItem('dn_playerName');
                 if (savedPlayerId && savedRoomCode && savedPlayerName) {
+                    store.dispatch(setLoading(true));
                     console.log(`♻️ Attempting to rejoin room ${savedRoomCode} as ${savedPlayerName}...`);
                     this.socket?.emit('room:rejoin', {
                         playerId: savedPlayerId,

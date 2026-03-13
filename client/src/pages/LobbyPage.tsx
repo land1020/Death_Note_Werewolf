@@ -11,7 +11,7 @@ import {
     selectRoleConfig
 } from '../store/roomSlice';
 import { selectGamePhase } from '../store/gameSlice';
-import { selectError } from '../store/uiSlice';
+import { selectError, selectIsLoading } from '../store/uiSlice';
 import { socketClient } from '../socket';
 import DebugLogOverlay from '../components/debug/DebugLogOverlay';
 import ColorPalette from '../components/lobby/ColorPalette';
@@ -35,13 +35,15 @@ export default function LobbyPage() {
     const [isDeckModalOpen, setIsDeckModalOpen] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
+    const isLoading = useAppSelector(selectIsLoading);
+
     // Redirect if not in room
     useEffect(() => {
-        if (!roomCode && code) {
+        if (!isLoading && !roomCode && code) {
             // Room not found in state, redirect to top
             navigate('/');
         }
-    }, [roomCode, code, navigate]);
+    }, [isLoading, roomCode, code, navigate]);
 
     // Redirect to game page when game starts
     useEffect(() => {

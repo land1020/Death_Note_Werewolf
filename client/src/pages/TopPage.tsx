@@ -1,11 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAppSelector } from '../hooks';
+import { selectRoomCode } from '../store/roomSlice';
+import { selectGamePhase } from '../store/gameSlice';
 import CreateRoomModal from '../components/CreateRoomModal';
 import JoinRoomModal from '../components/JoinRoomModal';
 
 export default function TopPage() {
+    const navigate = useNavigate();
+    const roomCode = useAppSelector(selectRoomCode);
+    const gamePhase = useAppSelector(selectGamePhase);
+
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showJoinModal, setShowJoinModal] = useState(false);
+
+    useEffect(() => {
+        if (roomCode) {
+            if (gamePhase && gamePhase !== 'LOBBY') {
+                navigate(`/game/${roomCode}`);
+            } else {
+                navigate(`/room/${roomCode}`);
+            }
+        }
+    }, [roomCode, gamePhase, navigate]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">

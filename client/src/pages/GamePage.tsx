@@ -18,7 +18,8 @@ import {
     selectCutsceneType,
     clearSelection,
     selectWatariReveal,
-    clearWatariReveal
+    clearWatariReveal,
+    selectIsLoading
 } from '../store/uiSlice';
 import PlayerCircle from '../components/game/PlayerCircle';
 import DebugLogOverlay from '../components/debug/DebugLogOverlay';
@@ -79,11 +80,13 @@ export default function GamePage() {
     // 次のプレイヤーに行動が移るか、時間経過でメッセージが消える仕様
     // （アクション発生時に都度上書き＆タイマーリセットされるのでcurrentPlayerの変更では消さない）
 
+    const isLoading = useAppSelector(selectIsLoading);
+
     useEffect(() => {
-        if (phase === 'LOBBY' as GamePhase) {
+        if (!isLoading && phase === 'LOBBY' as GamePhase) {
             navigate(`/room/${code}`);
         }
-    }, [phase, code, navigate]);
+    }, [isLoading, phase, code, navigate]);
 
     const isTargetSelecting = !!selectedCard && (
         selectedCard.id === 1 /* ARREST */ ||
