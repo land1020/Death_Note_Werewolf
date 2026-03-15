@@ -9,6 +9,9 @@ import {
     setRoom,
     joinedRoom,
     setPlayers,
+    setHost,
+    setDebugMode,
+    setSettings,
     resetRoom
 } from '../store/roomSlice';
 import {
@@ -136,7 +139,16 @@ class SocketClient {
         });
 
         this.socket.on('room:updated', (data) => {
-            store.dispatch(setPlayers(data.room.players));
+            const { room } = data;
+            store.dispatch(setPlayers(room.players));
+            store.dispatch(setHost(room.hostId));
+            store.dispatch(setDebugMode(!!room.isDebug));
+            store.dispatch(setSettings({
+                maxPlayers: room.maxPlayers,
+                useMello: room.useMello,
+                deckConfig: room.deckConfig,
+                roleConfig: room.roleConfig
+            }));
         });
 
         this.socket.on('room:error', (data) => {

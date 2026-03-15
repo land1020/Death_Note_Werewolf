@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../../hooks';
-import { selectMyPlayerId } from '../../../store/roomSlice';
+import { selectMyPlayerId, selectIsDebug } from '../../../store/roomSlice';
 import { selectGamePlayers } from '../../../store/gameSlice';
 import { socketClient } from '../../../socket';
 import { Role, CardId } from 'shared/types';
@@ -10,6 +10,7 @@ export const KiraJudgmentView: React.FC = () => {
     const players = useAppSelector(selectGamePlayers);
     const myPlayerId = useAppSelector(selectMyPlayerId);
     const myPlayer = players.find(p => p.id === myPlayerId);
+    const isDebug = useAppSelector(selectIsDebug);
     const hasDeathNote = myPlayer?.hand.some(c => c.id === CardId.DEATH_NOTE);
 
     // KiraMisaChat state is managed in Redux, so no props needed
@@ -111,12 +112,14 @@ export const KiraJudgmentView: React.FC = () => {
                                     : 'ターゲットを選択'
                                 }
                             </button>
-                            <button
-                                onClick={handleSkip}
-                                className="w-full mt-4 py-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xl font-bold border border-gray-600 hover:border-white transition-all"
-                            >
-                                スキップ
-                            </button>
+                            {isDebug && (
+                                <button
+                                    onClick={handleSkip}
+                                    className="w-full mt-4 py-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xl font-bold border border-gray-600 hover:border-white transition-all"
+                                >
+                                    スキップ (DEBUG)
+                                </button>
+                            )}
                         </>
                     ) : (
                         <>
@@ -129,12 +132,14 @@ export const KiraJudgmentView: React.FC = () => {
                                     今回の裁きは実行できません
                                 </p>
 
-                                <button
-                                    onClick={handleSkip}
-                                    className="w-full py-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold border border-gray-600 hover:border-white transition-all"
-                                >
-                                    スキップ
-                                </button>
+                                {isDebug && (
+                                    <button
+                                        onClick={handleSkip}
+                                        className="w-full py-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-xl font-bold border border-gray-600 hover:border-white transition-all"
+                                    >
+                                        スキップ (DEBUG)
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}

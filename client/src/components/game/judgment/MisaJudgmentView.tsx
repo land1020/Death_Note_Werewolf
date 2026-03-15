@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../../hooks';
 import { selectGamePlayers } from '../../../store/gameSlice';
+import { selectIsDebug } from '../../../store/roomSlice';
 import { Role } from 'shared/types';
 import { KiraMisaChat } from '../KiraMisaChat';
 import { socketClient } from '../../../socket';
 
 export const MisaJudgmentView: React.FC = () => {
     const players = useAppSelector(selectGamePlayers);
+    const isDebug = useAppSelector(selectIsDebug);
     const [isConfirmed, setIsConfirmed] = useState(false);
 
     const handleSkip = () => {
@@ -76,13 +78,17 @@ export const MisaJudgmentView: React.FC = () => {
                             キラの裁きを待っています...
                         </p>
 
-                        {!isConfirmed ? (
+                        {!isConfirmed && isDebug ? (
                             <button
                                 onClick={handleSkip}
                                 className="w-full py-4 text-xl font-bold border-2 border-gray-600 rounded-xl transition-all bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white"
                             >
-                                スキップ
+                                スキップ (DEBUG)
                             </button>
+                        ) : !isConfirmed ? (
+                            <p className="text-gray-500 italic">
+                                裁きの行方を見守ってください...
+                            </p>
                         ) : (
                             <div className="text-xl font-bold text-yellow-400 animate-pulse py-2">
                                 他のプレイヤーを待機中...

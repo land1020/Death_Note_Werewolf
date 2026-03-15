@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppSelector } from '../hooks';
@@ -257,7 +257,7 @@ export default function GamePage() {
         };
     }, [dispatch, players]);
 
-    const handleCutsceneComplete = () => {
+    const handleCutsceneComplete = useCallback(() => {
         const currentCutsceneType = cutsceneType;
         dispatch(endCutscene());
         if (currentCutsceneType === 'SHINIGAMI') {
@@ -269,39 +269,10 @@ export default function GamePage() {
         } else if (currentCutsceneType === 'JUDGMENT') {
             socketClient.socketInstance?.emit('game:judgmentCutsceneFinished');
         }
-    };
+    }, [dispatch, cutsceneType]);
 
     return (
         <div className="min-h-[100dvh] flex flex-col overflow-hidden relative select-none">
-            {/* Cutscene Overlay */}
-            {cutscenePlaying && cutsceneType === 'SHINIGAMI' && (
-                <CutscenePlayer
-                    type="SHINIGAMI"
-                    videoSrc="/assets/videos/shinigami.mp4"
-                    onComplete={handleCutsceneComplete}
-                />
-            )}
-            {cutscenePlaying && cutsceneType === 'GUN' && (
-                <CutscenePlayer
-                    type="GUN"
-                    videoSrc="/assets/videos/Death Note gun scene.mp4"
-                    onComplete={handleCutsceneComplete}
-                />
-            )}
-            {cutscenePlaying && cutsceneType === 'ARREST' && (
-                <CutscenePlayer
-                    type="ARREST"
-                    videoSrc="/assets/videos/Death Note arrest scene.mp4"
-                    onComplete={handleCutsceneComplete}
-                />
-            )}
-            {cutscenePlaying && cutsceneType === 'JUDGMENT' && (
-                <CutscenePlayer
-                    type="JUDGMENT"
-                    videoSrc="/assets/videos/Death Note Death Scene.mp4"
-                    onComplete={handleCutsceneComplete}
-                />
-            )}
 
             {/* Judgment Phase Overlay */}
             <AnimatePresence mode="wait">
@@ -318,6 +289,42 @@ export default function GamePage() {
             {/* Game Result Overlay */}
             <AnimatePresence mode="wait">
                 {phase === GamePhase.GAME_END && !effectModal.isOpen && <ResultScreen key="game-result" />}
+            </AnimatePresence>
+
+            {/* Cutscene Overlay - Always on top */}
+            <AnimatePresence>
+                {cutscenePlaying && cutsceneType === 'SHINIGAMI' && (
+                    <CutscenePlayer
+                        key="shinigami"
+                        type="SHINIGAMI"
+                        videoSrc="/assets/videos/shinigami.mp4"
+                        onComplete={handleCutsceneComplete}
+                    />
+                )}
+                {cutscenePlaying && cutsceneType === 'GUN' && (
+                    <CutscenePlayer
+                        key="gun"
+                        type="GUN"
+                        videoSrc="/assets/videos/Death Note gun scene.mp4"
+                        onComplete={handleCutsceneComplete}
+                    />
+                )}
+                {cutscenePlaying && cutsceneType === 'ARREST' && (
+                    <CutscenePlayer
+                        key="arrest"
+                        type="ARREST"
+                        videoSrc="/assets/videos/Death Note arrest scene.mp4"
+                        onComplete={handleCutsceneComplete}
+                    />
+                )}
+                {cutscenePlaying && cutsceneType === 'JUDGMENT' && (
+                    <CutscenePlayer
+                        key="judgment-cutscene"
+                        type="JUDGMENT"
+                        videoSrc="/assets/videos/Death Note Death Scene.mp4"
+                        onComplete={handleCutsceneComplete}
+                    />
+                )}
             </AnimatePresence>
 
             {/* Header - Phase & Round Info (左上固定) */}

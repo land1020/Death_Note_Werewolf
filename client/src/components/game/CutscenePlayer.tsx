@@ -21,17 +21,46 @@ export const CutscenePlayer: React.FC<CutscenePlayerProps> = ({ type, videoSrc, 
         }
     };
 
+    const encodedSrc = React.useMemo(() => encodeURI(videoSrc), [videoSrc]);
+
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.play()
-                .catch((e) => {
-                    console.error("Video play failed:", e);
+        let isCancelled = false;
+        const video = videoRef.current;
+        if (!video) return;
+
+        const playVideo = async () => {
+            try {
+                // Ensure video is loaded
+                if (video.readyState < 3) { // HAVE_FUTURE_DATA
+                    video.load();
+                }
+                await video.play();
+            } catch (e) {
+                if (isCancelled) return;
+                console.warn("Video play failed, trying muted:", e);
+                
+                // Autoplay policy fallback: try playing muted
+                try {
+                    video.muted = true;
+                    await video.play();
+                } catch (mutedError) {
+                    if (isCancelled) return;
+                    console.error("Muted video play also failed:", mutedError);
                     setError(true);
-                    // エラー時はフォールバックとして数秒後に完了扱いにする
-                    setTimeout(onComplete, 3000);
-                });
-        }
-    }, [videoSrc, onComplete]);
+                    // Fallback to text for 3 seconds
+                    setTimeout(() => {
+                        if (!isCancelled) onComplete();
+                    }, 3000);
+                }
+            }
+        };
+
+        playVideo();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [encodedSrc, onComplete]);
 
     const handleEnded = () => {
         onComplete();
@@ -48,9 +77,10 @@ export const CutscenePlayer: React.FC<CutscenePlayerProps> = ({ type, videoSrc, 
                 {!error ? (
                     <video
                         ref={videoRef}
-                        src={videoSrc}
+                        src={encodedSrc}
                         className="w-full h-full object-contain"
                         onEnded={handleEnded}
+                        autoPlay
                         playsInline
                     // controls // デバッグ用
                     />

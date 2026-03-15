@@ -33,22 +33,26 @@ export const JudgmentScreen: React.FC = () => {
             <JudgmentBackground />
 
             {/* Main Content */}
-            <div className="relative z-10 w-full h-full flex flex-col p-4 md:p-8">
+            <div className="relative z-10 w-full h-full flex flex-col pt-2 pb-4 md:pb-8">
 
-                {/* Header */}
-                <JudgmentHeader />
+                {/* Header - Fixed at top */}
+                <div className="flex-shrink-0">
+                    <JudgmentHeader />
+                </div>
 
-                {/* View Switcher based on Role */}
-                <div className="flex-1 flex items-center justify-center w-full mt-4">
-                    {isSpectator ? (
-                        <SpectatorJudgmentView />
-                    ) : isKira ? (
-                        <KiraJudgmentView />
-                    ) : isMisa ? (
-                        <MisaJudgmentView />
-                    ) : (
-                        <OtherPlayerJudgmentView />
-                    )}
+                {/* View Switcher based on Role - Scrollable area to prevent cut-off */}
+                <div className="flex-1 w-full mt-2 overflow-y-auto px-2 md:px-4 custom-scrollbar focus:outline-none">
+                    <div className="min-h-full flex items-start justify-center py-4">
+                        {isSpectator ? (
+                            <SpectatorJudgmentView />
+                        ) : isKira ? (
+                            <KiraJudgmentView />
+                        ) : isMisa ? (
+                            <MisaJudgmentView />
+                        ) : (
+                            <OtherPlayerJudgmentView />
+                        )}
+                    </div>
                 </div>
 
             </div>

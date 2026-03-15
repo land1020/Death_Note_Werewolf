@@ -13,7 +13,7 @@ export const JudgmentHeader: React.FC = () => {
     }, []);
 
     return (
-        <div className="pt-8 text-center relative z-10 pointer-events-none">
+        <div className="pt-4 text-center relative z-10 pointer-events-none">
             {/* Title */}
             <motion.h1
                 initial={{ y: -50, opacity: 0 }}

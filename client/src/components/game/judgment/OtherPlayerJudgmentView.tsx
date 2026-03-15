@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAppSelector } from '../../../hooks';
+import { selectIsDebug } from '../../../store/roomSlice';
 import { socketClient } from '../../../socket';
 
 export const OtherPlayerJudgmentView: React.FC = () => {
+    const isDebug = useAppSelector(selectIsDebug);
     const [isConfirmed, setIsConfirmed] = useState(false);
 
     const handleSkip = () => {
@@ -67,13 +70,17 @@ export const OtherPlayerJudgmentView: React.FC = () => {
                 </div>
 
                 {/* Skip Button */}
-                {!isConfirmed ? (
+                {!isConfirmed && isDebug ? (
                     <button
                         onClick={handleSkip}
                         className="py-4 px-12 text-xl font-bold border-4 border-gray-600 rounded-xl transition-all bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white"
                     >
-                        スキップ
+                        スキップ (DEBUG)
                     </button>
+                ) : !isConfirmed ? (
+                    <p className="text-gray-500 italic text-lg">
+                        静かにその時を待っています...
+                    </p>
                 ) : (
                     <div className="text-xl font-bold text-yellow-400 animate-pulse">
                         他のプレイヤーを待機中...
