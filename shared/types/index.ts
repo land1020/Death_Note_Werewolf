@@ -240,6 +240,7 @@ export interface GameState {
 
     // キラが逮捕されたかどうか（リザルト画面表示用）
     kiraArrested?: boolean;
+    skipVictoryVideo?: boolean;
 }
 
 // =====================================================

@@ -11,15 +11,16 @@ export const ResultScreen: React.FC = () => {
     const players = useAppSelector(selectGamePlayers);
     const isHost = useAppSelector(selectIsHost);
     const kiraArrested = useAppSelector(state => state.game.kiraArrested);
+    const skipVictoryVideo = useAppSelector(state => state.game.skipVictoryVideo);
 
     // キラ勝利時の演出動画ステート
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
     useEffect(() => {
-        if (winner === WinCondition.KIRA_WINS) {
+        if (winner === WinCondition.KIRA_WINS && !skipVictoryVideo) {
             setIsVideoPlaying(true);
         }
-    }, [winner]);
+    }, [winner, skipVictoryVideo]);
 
     // 勝利陣営の表示内容を決定
     const getWinnerTextAndColor = () => {

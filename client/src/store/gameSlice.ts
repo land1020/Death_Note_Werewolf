@@ -37,6 +37,7 @@ const initialState: GameState = {
         transferHistory: [],
     },
     hasDrawnCard: false,
+    skipVictoryVideo: false,
 };
 
 const gameSlice = createSlice({

@@ -2139,6 +2139,7 @@ function continueAfterJudgmentCutscene(
     if (winCondition) {
         game.winner = winCondition;
         game.phase = GamePhase.GAME_END as any;
+        game.skipVictoryVideo = true;
         io.to(roomCode).emit('game:ended', { winner: winCondition, finalState: game });
     } else {
         // Proceed to Result Phase
