@@ -240,7 +240,10 @@ const gameSlice = createSlice({
         },
 
         // ゲーム終了
-        endGame: (state, action: PayloadAction<{ winner: WinCondition }>) => {
+        endGame: (state, action: PayloadAction<{ winner: WinCondition; finalState?: GameState }>) => {
+            if (action.payload.finalState) {
+                Object.assign(state, action.payload.finalState);
+            }
             state.winner = action.payload.winner;
             state.phase = 'GAME_END' as GamePhase;
         },

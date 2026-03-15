@@ -625,7 +625,7 @@ export function setupSocketHandlers(io: TypedServer) {
 
                     // Send active game state if running
                     const game = games.get(roomCode);
-                    if (game && game.phase !== GamePhase.GAME_END && game.phase !== GamePhase.LOBBY) {
+                    if (game && game.phase !== GamePhase.LOBBY) {
                         socket.emit('game:state', { gameState: createPersonalizedState(game, existingPlayer.id) });
                     }
                     return;
@@ -695,7 +695,7 @@ export function setupSocketHandlers(io: TypedServer) {
 
             // If game is active, send game state to restore the client view
             const game = games.get(roomCode);
-            if (game && game.phase !== GamePhase.GAME_END && game.phase !== GamePhase.LOBBY) {
+            if (game && game.phase !== GamePhase.LOBBY) {
                 socket.emit('game:state', { gameState: createPersonalizedState(game, playerId) });
             }
         });

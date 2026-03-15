@@ -226,7 +226,10 @@ class SocketClient {
         });
 
         this.socket.on('game:ended', (data) => {
-            store.dispatch(endGame({ winner: data.winner }));
+            store.dispatch(endGame({ 
+                winner: data.winner, 
+                finalState: data.finalState 
+            }));
         });
 
         // Judgment events
