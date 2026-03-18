@@ -256,8 +256,8 @@ const gameSlice = createSlice({
         },
 
         // 裁きの結果
-        setJudgmentResult: (state, action: PayloadAction<{ eliminatedPlayerId: string | null; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }>) => {
-            const { eliminatedPlayerId, votes, usedFakeName, survivedTargetId } = action.payload;
+        setJudgmentResult: (state, action: PayloadAction<{ eliminatedPlayerId: string | null; eliminatedRole?: Role; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }>) => {
+            const { eliminatedPlayerId, eliminatedRole, votes, usedFakeName, survivedTargetId } = action.payload;
 
             let targetName = undefined;
             let targetRole = undefined;
@@ -267,7 +267,7 @@ const gameSlice = createSlice({
                 const target = state.players.find(p => p.id === eliminatedPlayerId);
                 if (target) {
                     targetName = target.name;
-                    targetRole = target.role ?? undefined;
+                    targetRole = eliminatedRole ?? target.role ?? undefined;
                     survived = false;
                 }
             } else if (survivedTargetId && usedFakeName) {

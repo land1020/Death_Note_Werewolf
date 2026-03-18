@@ -5,6 +5,7 @@ import type {
     Role,
     ChatMessage
 } from '../../../shared/types/index.js';
+import { addToDiscardPile } from './gameLogic.js';
 
 // =====================================================
 // 裁きの時間の結果型定義
@@ -169,7 +170,7 @@ export class JudgmentProcessor {
                 reason: 'DEATH' as any,
             });
 
-            state.discardPile.push(card);
+            addToDiscardPile(state, card);
         }
         player.hand = [];
 

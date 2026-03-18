@@ -358,6 +358,14 @@ export async function completeExchangeTrade(
         exchangeCard.history.push(`${user.name} が ${target.name} と手札を交換`);
 
         addToDiscardPile(game, exchangeCard);
+
+        io.to(roomCode).emit('game:cardUsed', {
+            playerId: userId,
+            playerName: user.name,
+            cardId: exchangeCard.id,
+            cardName: exchangeCard.name,
+            targetPlayerId: targetId,
+        });
     } else if (cardFromUser) {
         // fallback (Should not happen normally)
         if (cardFromTarget) user.hand.push(cardFromTarget);
@@ -1291,8 +1299,8 @@ export function setupSocketHandlers(io: TypedServer) {
                     if (!result.gameEnd) {
                         const winner = checkWinCondition(game);
                         if (winner) {
-                            endGame(io, game, roomCode, winner);
-                            return;
+                            result.gameEnd = true;
+                            result.winner = winner;
                         }
                     }
                 } else if (card.id === CardId.EXCHANGE) {
@@ -1404,13 +1412,6 @@ export function setupSocketHandlers(io: TypedServer) {
                     // TODO: addChatMessage system
                 }
 
-                // 結果に応じた処理
-                if (result.gameEnd && result.winner) {
-                    game.winner = result.winner;
-                    game.phase = 'GAME_END' as any;
-                    io.to(roomCode).emit('game:ended', { winner: result.winner, finalState: game });
-                }
-
                 if (result.revealedInfo) {
                     // 情報公開（特定プレイヤーのみ）
                     const visibleSocketIds: string[] = [];
@@ -1428,6 +1429,14 @@ export function setupSocketHandlers(io: TypedServer) {
                 if (result.transfers) {
                     game.publicInfo.transferHistory.push(...result.transfers);
                     io.to(roomCode).emit('game:cardTransferred', { transfers: result.transfers });
+                }
+
+                // 結果に応じた処理
+                if (result.gameEnd && result.winner) {
+                    game.winner = result.winner;
+                    game.phase = 'GAME_END' as any;
+                    io.to(roomCode).emit('game:ended', { winner: result.winner, finalState: game });
+                    return;
                 }
 
                 // 取調・投票の場合はターンを進めない（アクション待ち）
@@ -2146,6 +2155,7 @@ function continueAfterJudgmentCutscene(
         game.phase = GamePhase.JUDGMENT_RESULT as any;
         io.to(roomCode).emit('judgment:result', {
             eliminatedPlayerId: (!result.survived ? result.targetId : null),
+            eliminatedRole: (!result.survived ? result.eliminatedRole : undefined),
             votes: game.pendingAction?.votes || {},
             usedFakeName: result.usedFakeName,
             survivedTargetId: result.survived && result.usedFakeName ? result.targetId : undefined

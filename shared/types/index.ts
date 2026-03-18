@@ -410,7 +410,7 @@ export interface ServerToClientEvents {
     // 裁きの時間
     'judgment:started': () => void;
     'judgment:voted': (data: { voterId: string; targetId: string }) => void;
-    'judgment:result': (data: { eliminatedPlayerId: string | null; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }) => void;
+    'judgment:result': (data: { eliminatedPlayerId: string | null; eliminatedRole?: Role; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }) => void;
 
     // チャット（キラ-ミサ）
     'chat:message': (data: ChatMessage) => void;
@@ -600,7 +600,7 @@ export interface ServerToClientEvents {
 
     'judgment:started': () => void;
     'judgment:voted': (data: { voterId: string; targetId: string }) => void;
-    'judgment:result': (data: { eliminatedPlayerId: string | null; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }) => void;
+    'judgment:result': (data: { eliminatedPlayerId: string | null; eliminatedRole?: Role; votes: Record<string, string>; usedFakeName?: boolean; survivedTargetId?: string | null }) => void;
 
     'chat:message': (data: ChatMessage) => void;
     'chat:kiraMisa': (data: ChatMessage) => void;
