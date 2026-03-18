@@ -1,28 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppSelector } from '../../hooks';
 import { GamePhase, Role } from 'shared/types';
 
 export const JudgmentResultScreen: React.FC = () => {
-    // We need to get the result from Redux state
-    // Previously 'judgmentResult' was removed from some places but it should exist in GameState
     const judgmentResult = useAppSelector(state => state.game.judgmentResult);
     const phase = useAppSelector(state => state.game.phase);
-
-    // Video play state
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-
-    useEffect(() => {
-        if (phase === GamePhase.JUDGMENT_RESULT && judgmentResult) {
-            const { targetName, survived } = judgmentResult;
-            if (targetName && !survived) {
-                // Someone died, play video
-                setIsVideoPlaying(true);
-            } else {
-                setIsVideoPlaying(false);
-            }
-        }
-    }, [phase, judgmentResult]);
 
     // Only show if we have a result and correct phase
     if (phase !== GamePhase.JUDGMENT_RESULT || !judgmentResult) return null;
@@ -40,7 +23,6 @@ export const JudgmentResultScreen: React.FC = () => {
             [Role.MELLO]: 'メロ',
             [Role.POLICE]: '警察',
         };
-        // Fallback or specific handling if Role enum differs
         return names[role] || role;
     };
 
@@ -51,23 +33,8 @@ export const JudgmentResultScreen: React.FC = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden"
         >
-            {isVideoPlaying && targetName && !survived ? (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black">
-                    <video
-                        src="/assets/videos/Death Note Death Scene.mp4"
-                        autoPlay
-                        playsInline
-                        className="w-full h-full object-cover"
-                        onEnded={() => setIsVideoPlaying(false)}
-                        onError={(e) => {
-                            console.error("Death Scene Video failed to play", e);
-                            setIsVideoPlaying(false);
-                        }}
-                    />
-                </div>
-            ) : (
-                <>
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black pointer-events-none" />
+            {/* カットシーン動画は CutscenePlayer で既に再生済みのため、ここでは結果のみ表示 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black pointer-events-none" />
 
                     <div className="text-center px-4 relative z-10 max-w-4xl w-full">
 
@@ -193,8 +160,6 @@ export const JudgmentResultScreen: React.FC = () => {
                         </motion.div>
 
                     </div>
-                </>
-            )}
         </motion.div>
     );
 };

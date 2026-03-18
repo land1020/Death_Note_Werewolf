@@ -448,15 +448,15 @@ export const CARD_DEFINITIONS: Record<CardId, { name: string; description: strin
         description: '逮捕を無効化する',
     },
     [CardId.WITNESS]: {
-        name: '目撃者',
+        name: '目撃',
         description: '対象プレイヤーの手札を1枚見る',
     },
     [CardId.SURVEILLANCE]: {
-        name: '監視カメラ',
+        name: '監視',
         description: 'カード交換を見ることができる',
     },
     [CardId.VOTE]: {
-        name: '会議',
+        name: '投票',
         description: '裁きの時間を発動する',
     },
     [CardId.EXCHANGE]: {
@@ -464,11 +464,11 @@ export const CARD_DEFINITIONS: Record<CardId, { name: string; description: strin
         description: '対象プレイヤーと手札を交換する',
     },
     [CardId.INTERROGATION]: {
-        name: '尋問',
+        name: '取調',
         description: '対象プレイヤーの役職を確認する（嘘をつける）',
     },
     [CardId.SHINIGAMI]: {
-        name: '死神の目',
+        name: '死神',
         description: '対象プレイヤーの役職を見る',
     },
 };
