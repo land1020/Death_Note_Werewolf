@@ -82,7 +82,7 @@ export function processDeath(
             card.usedByName = victim.name;
             card.usedByColor = victim.color;
             if (!card.history) card.history = [];
-            card.history.push(`${victim.name}が死亡して捨てられた`);
+            card.history.push(`${victim.name}が死亡した`);
             addToDiscardPile(game, card);
         }
         victim.hand = [];

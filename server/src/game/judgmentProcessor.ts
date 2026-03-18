@@ -157,7 +157,7 @@ export class JudgmentProcessor {
         }
         for (const card of player.hand) {
             if (!card.history) card.history = [];
-            card.history.push(`${player.name} の死亡により捨て札`);
+            card.history.push(`${player.name}が死亡した`);
             card.usedByName = player.name;
             card.usedByColor = player.color;
 
