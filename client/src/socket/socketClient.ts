@@ -152,6 +152,7 @@ class SocketClient {
         });
 
         this.socket.on('room:error', (data) => {
+            console.error('❌ room:error received:', data.message);
             store.dispatch(setError(data.message));
             store.dispatch(setLoading(false));
 

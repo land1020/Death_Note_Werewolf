@@ -422,7 +422,7 @@ export default function ActionPanel({
                             </button>
                         </div>
                     </>
-                ) : (
+                ) : isMyTurn ? (
                     <div className="text-center p-2 border border-dashed border-dn-border/40 rounded-lg bg-black/20">
                         <p className="text-xs text-dn-text-secondary leading-relaxed animate-pulse">
                             {!hasDrawnCard ? 'カードを自動で引いています...' : '手札のカードを選んでください'}
@@ -441,7 +441,7 @@ export default function ActionPanel({
                             </div>
                         )}
                     </div>
-                )}
+                ) : null}
 
 
 
